@@ -1,0 +1,8 @@
+<label>Keyboard shortcut sequence</label>
+<input type="text" placeholder="Ctrl+Alt+D" #input>
+<button (click)=addButton.next(input.value)>Add</button>
+<p>Keyboard shortcuts:</p>
+<ul>
+  {{(validShortcuts | async)?.text}}
+  {{(invalidShortcuts | async)?.text}}
+</ul>
