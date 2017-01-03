@@ -15,31 +15,14 @@ export class KeyboardShortcutsComponent implements OnInit {
   $shortCutPrompts: any;
   constructor(private kbShortcuts: KeyboardShortcutsService) {
     this.addButton = new Subject()
+      .startWith('Ctrl+Alt+D', 'Ctrl+Shift+S', 'Trash')
       .map(text => {
-        console.log(`text`, );
         return {
           id: (text as string).replace(/\+/g, '_'),
           text: text
         };
       });
-    /*.startWith('Ctrl+Alt+D', 'Ctrl+Shift+S', 'Trash')
-    .map(text => {
-      console.log(`text`, );
-      return {
-        id: (text as string).replace(/\+/g, '_'),
-        text: text
-      };
-    });*/
     this.$shortcutSequences = this.addButton;
-    /*this.$shortcutSequences
-      .startWith('Ctrl+Alt+D', 'Ctrl+Shift+S', 'Trash')
-      .map(text => {
-        console.log(`text`, );
-        return {
-          id: (text as string).replace(/\+/g, '_'),
-          text: text
-        };
-      });*/
     this.addButton
       .subscribe(value => {
         console.log(`value`, value);
