@@ -3,7 +3,7 @@
 <button (click)=$addButton.next(input.value)>Add</button>
 <p>Valid Keyboard shortcuts:</p>
 <ul>
-  <li *ngFor="let i of validShortcutsList">{{i.text}} {{i.count}}</li>
+  <li *ngFor="let i of validShortcutsList">{{i.text}}: {{i.count}}</li>
 </ul>
 <p>Invalid Keyboard shortcuts:</p>
 <ul>
