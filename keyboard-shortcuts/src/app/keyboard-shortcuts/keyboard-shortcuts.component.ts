@@ -8,13 +8,15 @@ import { KeyboardShortcutsService } from './keyboard-shortcuts.service';
   styleUrls: ['./keyboard-shortcuts.component.css']
 })
 export class KeyboardShortcutsComponent implements OnInit {
-  addButton: any;
+  $addButton: Observable<any>;
   $shortcutSequences: Observable<any>;
-  validShortcuts: any;
-  invalidShortcuts: any;
-  $shortCutPrompts: any;
+  $validShortcuts: Observable<any>;
+  $invalidShortcuts: Observable<any>;
+  $shortCutPrompts: Observable<any>;
+  validShortcutsList = [];
+  invalidShortcutsList = [];
   constructor(private kbShortcuts: KeyboardShortcutsService) {
-    this.addButton = new Subject()
+    this.$addButton = new Subject()
       .startWith('Ctrl+Alt+D', 'Ctrl+Shift+S', 'Trash')
       .map(text => {
         return {
@@ -22,14 +24,14 @@ export class KeyboardShortcutsComponent implements OnInit {
           text: text
         };
       });
-    this.$shortcutSequences = this.addButton;
-    this.addButton
+    this.$shortcutSequences = this.$addButton;
+    this.$addButton
       .subscribe(value => {
         console.log(`value`, value);
       });
-    this.validShortcuts = this.$shortcutSequences.filter(seq => kbShortcuts.validate(seq.text));
-    this.invalidShortcuts = this.$shortcutSequences.filter(seq => !kbShortcuts.validate(seq.text));
-    this.$shortCutPrompts = this.validShortcuts
+    this.$validShortcuts = this.$shortcutSequences.filter(seq => kbShortcuts.validate(seq.text));
+    this.$invalidShortcuts = this.$shortcutSequences.filter(seq => !kbShortcuts.validate(seq.text));
+    this.$shortCutPrompts = this.$validShortcuts
       .flatMap(obj => {
         return kbShortcuts.createShortcutStream(obj.text)
           .scan((acc, x, seed) => acc + 1, 0)
@@ -41,9 +43,14 @@ export class KeyboardShortcutsComponent implements OnInit {
           });
       }
       );
-    this.validShortcuts.subscribe(test => console.log(`valid`, test));
-    this.invalidShortcuts.subscribe(test => console.log(`invalid`, test));
-    this.$shortCutPrompts.subscribe(obj => console.log(obj.count));
+    this.$validShortcuts.subscribe(obj => this.validShortcutsList.push(obj));
+    this.$invalidShortcuts.subscribe(obj => this.invalidShortcutsList.push(obj));
+    this.$shortCutPrompts.subscribe(obj => {
+      let r = this.validShortcutsList.filter(_obj => _obj.id == obj.id);
+      if (r[0]) {
+        r[0].count = obj.count;
+      }
+    });
   }
   ngOnInit() {
   }
