@@ -17,7 +17,7 @@ export class KeyboardShortcutsComponent implements OnInit {
   invalidShortcutsList = [];
   constructor(private kbShortcuts: KeyboardShortcutsService) {
     this.$addButton = new Subject()
-      .startWith('Ctrl+Alt+D', 'Ctrl+Shift+S', 'Trash')
+      // .startWith('Ctrl+Alt+D', 'Ctrl+Shift+S', 'Trash')
       .map(text => {
         return {
           id: (text as string).replace(/\+/g, '_'),
