@@ -1,6 +1,6 @@
 <label>Keyboard shortcut sequence</label>
 <input type="text" placeholder="Ctrl+Alt+D" #input>
-<button (click)=$addButton.next(input.value)>Add</button>
+<button (click)=sequenceSbj.next(input.value)>Add</button>
 <p>Valid Keyboard shortcuts:</p>
 <ul>
   <li *ngFor="let i of validShortcutsList">{{i.text}}: {{i.count}}</li>

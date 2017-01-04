@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { Subject } from 'rxjs/Subject';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { KeyboardShortcutsService } from './keyboard-shortcuts.service';
 @Component({
   selector: 'app-keyboard-shortcuts',
@@ -8,7 +9,7 @@ import { KeyboardShortcutsService } from './keyboard-shortcuts.service';
   styleUrls: ['./keyboard-shortcuts.component.css']
 })
 export class KeyboardShortcutsComponent implements OnInit {
-  $addButton: Observable<any>;
+  sequenceSbj: ReplaySubject<any>;
   $shortcutSequences: Observable<any>;
   $validShortcuts: Observable<any>;
   $invalidShortcuts: Observable<any>;
@@ -16,19 +17,24 @@ export class KeyboardShortcutsComponent implements OnInit {
   validShortcutsList = [];
   invalidShortcutsList = [];
   constructor(private kbShortcuts: KeyboardShortcutsService) {
-    this.$addButton = new Subject()
-      // .startWith('Ctrl+Alt+D', 'Ctrl+Shift+S', 'Trash')
+    this.sequenceSbj = new ReplaySubject();
+    this.sequenceSbj.next('Ctrl+Alt+D');
+    this.sequenceSbj.next('Ctrl+Alt+S');
+    this.sequenceSbj.next('Trash');
+
+    this.$shortcutSequences = this.sequenceSbj
       .map(text => {
         return {
           id: (text as string).replace(/\+/g, '_'),
           text: text
         };
       });
-    this.$shortcutSequences = this.$addButton;
-    this.$addButton
+
+    this.$shortcutSequences
       .subscribe(value => {
         console.log(`value`, value);
       });
+
     this.$validShortcuts = this.$shortcutSequences.filter(seq => kbShortcuts.validate(seq.text));
     this.$invalidShortcuts = this.$shortcutSequences.filter(seq => !kbShortcuts.validate(seq.text));
     this.$shortCutPrompts = this.$validShortcuts
@@ -43,6 +49,7 @@ export class KeyboardShortcutsComponent implements OnInit {
           });
       }
       );
+
     this.$validShortcuts.subscribe(obj => this.validShortcutsList.push(obj));
     this.$invalidShortcuts.subscribe(obj => this.invalidShortcutsList.push(obj));
     this.$shortCutPrompts.subscribe(obj => {
@@ -51,6 +58,7 @@ export class KeyboardShortcutsComponent implements OnInit {
         r[0].count = obj.count;
       }
     });
+
   }
   ngOnInit() {
   }
