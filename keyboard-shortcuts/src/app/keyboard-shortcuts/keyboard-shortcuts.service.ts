@@ -37,9 +37,7 @@ export class KeyboardShortcutsService {
       char: charCode,
       stream: this.keyEvents
         .filter((event) => event.keyCode === charCode)
-        .map(function (e) {
-          return e.type;
-        })
+        .map(e => e.type)
     };
   }
 
