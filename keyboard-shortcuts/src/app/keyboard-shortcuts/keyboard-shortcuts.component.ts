@@ -19,7 +19,7 @@ export class KeyboardShortcutsComponent implements OnInit {
   constructor(private kbShortcuts: KeyboardShortcutsService) {
     this.sequenceSbj = new ReplaySubject();
     this.sequenceSbj.next('Ctrl+Alt+D');
-    this.sequenceSbj.next('Ctrl+Alt+S');
+    this.sequenceSbj.next('Ctrl+Shift+S');
     this.sequenceSbj.next('Trash');
 
     this.shortcutSequences$ = this.sequenceSbj
@@ -39,6 +39,7 @@ export class KeyboardShortcutsComponent implements OnInit {
     this.invalidShortcuts$ = this.shortcutSequences$.filter(seq => !kbShortcuts.validate(seq.text));
     this.shortCutPrompts$ = this.validShortcuts$
       .flatMap(obj => {
+        console.log(`shortCutPrompts$ obj`, obj);
         return kbShortcuts.createShortcutStream(obj.text)
           .scan((acc, x, seed) => acc + 1, 0)
           .map(count => {
