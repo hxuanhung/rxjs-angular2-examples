@@ -1,5 +1,5 @@
 <div class="numeric-keyboard">
-  <input class="keyboard-input" disabled type="text" value="{{progress | async}}">
+  <input class="keyboard-input" disabled type="text" value="{{progress$ | async}}">
   <div class="numpad-container">
     <div class="numpad"><button (click)="numberSbj.next(1)">1</button></div>
     <div class="numpad"><button (click)="numberSbj.next(2)">2</button></div>

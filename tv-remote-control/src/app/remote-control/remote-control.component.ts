@@ -25,7 +25,7 @@ export class RemoteControlComponent implements OnInit {
     });
   })*/
   // progress = this.numberSbj.takeUntil(this.completed).repeat();
-  progress = this.number$.takeUntil(Observable.timer(2000)).repeat();
+  progress$: Observable<any>;
 
   private searchBox;
   constructor() { }
@@ -34,9 +34,19 @@ export class RemoteControlComponent implements OnInit {
     /*this.completed.subscribe(e => {
       console.log(`completed`, e);
     })*/
-    this.progress.subscribe(e => {
+    this.init();
+    this.progress$.subscribe(function (x) {
+      console.log('Next: %s', x);
+    },
+      function (err) {
+        console.log('Error: %s', err);
+      },
+      function () {
+        console.log('Completed');
+      })
+    /*this.progress.subscribe(e => {
       console.log(`progress`, e);
-    })
+    })*/
     // this.inputChange.subscribe(e => console.log(e));
     // this.numberSbj.subscribe(key => console.log(key));
   }
@@ -45,9 +55,14 @@ export class RemoteControlComponent implements OnInit {
     this.inputChange.next(e);
   }
 
-  //TODO: Given a number is chosen, when I click on reset, it has to reset immediately.
+  init() {
+    this.progress$ = this.number$.takeUntil(Observable.timer(2000)).repeat();
+  }
+
   resetInput() {
-    this.numberSbj.next(0);
-    this.numberSbj.next(0);
+    /*this.numberSbj.next(0);
+    this.numberSbj.next(0);*/
+    this.progress$ = Observable.empty();
+    this.init();
   }
 }
