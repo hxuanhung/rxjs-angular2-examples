@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Rx';
+const TIME = 2000;
 @Component({
   selector: 'app-remote-control',
   templateUrl: './remote-control.component.html',
@@ -8,15 +9,12 @@ import { Observable } from 'rxjs/Rx';
 })
 export class RemoteControlComponent implements OnInit {
   inputChange = new Subject();
-  @Input() maxInput: number= 0;
+  @Input() maxInput: number = 0;
   @Output() search = new EventEmitter();
   numberSbj = new Subject();
 
   number$ = this.numberSbj.map(e => String(e))
-    .scan((a, b) => {
-      console.log(`ab`, a, b, a + b, (a.length === this.maxInput) ? a : a + b);
-      return (a.length === this.maxInput) ? a : a + b;
-    })
+    .scan((a, b) => (a.length === this.maxInput) ? b : a + b)
     .distinctUntilChanged()
   /*completed = this.numberSbj.switchMap(live => {
     console.log(`Switchmap`, live);
@@ -57,7 +55,7 @@ export class RemoteControlComponent implements OnInit {
   }
 
   init() {
-    this.progress$ = this.number$.takeUntil(Observable.timer(1000*this.maxInput)).repeat();
+    this.progress$ = this.number$.takeUntil(Observable.timer(TIME * this.maxInput)).repeat();
   }
 
   resetInput() {
