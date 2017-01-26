@@ -14,8 +14,8 @@ export class RemoteControlComponent implements OnInit {
   number$ = this.numberSbj.map(e => String(e))
     .scan((a, b) => (a.length === this.maxInput) ? b : a + b)
     .distinctUntilChanged()
-  progress$: Observable<any>;
-
+  progress$: Observable<string>;
+  progress: string;
   constructor() { }
 
   ngOnInit() {
@@ -24,10 +24,19 @@ export class RemoteControlComponent implements OnInit {
 
   init() {
     this.progress$ = this.number$.takeUntil(Observable.timer(TIME * this.maxInput)).repeat();
+    this.progress$.subscribe(x => this.progress = x);
   }
 
   resetInput() {
     this.progress$ = Observable.empty();
     this.init();
+  }
+
+  correctInput() {
+    this.resetInput();
+    setTimeout(() => {
+      let str = this.progress.substring(0, this.progress.length - 1).split('');
+      str.forEach(x => this.numberSbj.next(x));
+    }, 1);
   }
 }
