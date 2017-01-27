@@ -1,5 +1,7 @@
 <h1>
   {{title}}
 </h1>
-<app-remote-control [maxInput]=2></app-remote-control>
-<app-remote-control [maxInput]=5></app-remote-control>
+<h1>{{doAction}}</h1>
+<p>binding {{binding}}</p>
+<app-remote-control [maxInput]=5 [keyboardInput]="binding" (sendInput)=onChange($event)></app-remote-control>
+<button (click)="binding='2'">2</button>
