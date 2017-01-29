@@ -3,14 +3,16 @@ import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 
 import { Observable } from 'rxjs/Rx';
-const TIME = 5000;
+/**
+ * TIMES*1000 = number of seconds to wait between two consecutive inputs
+ */
+const TIMES = 5;
 @Component({
   selector: 'app-numeric-keypad',
   templateUrl: './numeric-keypad.component.html',
   styleUrls: ['./numeric-keypad.component.css']
 })
 export class NumericKeypadComponent implements OnInit {
-
   @Input() maxInput: number = 0;
   @Input() showInput: boolean = true;
   @Input() addLeadingZeros = false;
@@ -18,66 +20,81 @@ export class NumericKeypadComponent implements OnInit {
   @Input() keyboardInput: string = '';
   @Output() sendInput = new EventEmitter();
   numberSbj = new Subject();
-
-  number$ = this.numberSbj.map(e => String(e))
-    .scan((a, b) => (a.length === this.maxInput) ? b : a + b)
-    .distinctUntilChanged();
-  progress$: Observable<string>;
+  number$: Observable<string>;
+  numberSubscription: Subscription;
   progress: string;
+  flagCounter$: Observable<any>;
+  flagSubscription: Subscription;
+  flag = false;
   progressWithLeadingZeros: string;
-  progressSub: Subscription;
 
   constructor() { }
 
   ngOnChanges() {
+    this.resetNumberStream();
     if (this.keyboardInput.length > 0) {
       this.addInput(this.keyboardInput);
     }
   }
 
   ngOnInit() {
-    this.init();
+    this.initNumberStream();
+
+    this.flagCounter$ = this.number$.switchMap(x => Observable.interval(1000));
+    this.flagSubscription = this.flagCounter$.subscribe(count => {
+      count >= TIMES ? this.flag = true : this.flag = false;
+    });
+
     if (this.keyboardInput.length > 0) {
+      /**
+       * Pad leading zeros if a default keyboard input is provided to reset once on the very first click
+       */
       this.keyboardInput = this.padLeadingZeros(this.keyboardInput, this.maxInput);
       this.addInput(this.keyboardInput);
     }
   }
 
   ngOnDestroy() {
-    this.progressSub.unsubscribe();
+    if (this.flagSubscription) {
+      this.flagSubscription.unsubscribe();
+    }
+    if (this.numberSubscription) {
+      this.numberSubscription.unsubscribe();
+    }
   }
 
-  init() {
-    this.progress$ = this.number$.takeUntil(Observable.timer(TIME)).repeat();
-    this.progressSub = this.progress$.subscribe(x => {
+  initNumberStream() {
+    this.number$ = this.numberSbj
+      .map(e => String(e))
+      .scan((a, b) => (a.length === this.maxInput || this.flag) ? b : a + b)
+      .distinctUntilChanged();
+
+    this.numberSubscription = this.number$.subscribe(x => {
       this.progress = x;
-      if (this.addLeadingZeros) {
-        this.progressWithLeadingZeros = this.padLeadingZeros(this.progress, this.maxInput);
-      }
       this.sendInput.emit(this.progress);
     });
   }
 
-  reset() {
-    this.progressSub.unsubscribe();
-    this.progress$ = Observable.empty();
-    this.init();
+  resetNumberStream() {
+    if (this.numberSubscription) {
+      this.numberSubscription.unsubscribe();
+    }
+    this.number$ = Observable.empty();
+    this.initNumberStream();
   }
 
   resetInput() {
     this.progress = '';
+    this.sendInput.emit(this.progress);
     if (this.addLeadingZeros) {
-      this.progressWithLeadingZeros = this.padLeadingZeros(this.progress, this.maxInput);
+      this.progressWithLeadingZeros = this.padLeadingZeros('', this.maxInput);
     }
-    this.reset();
-    this.sendInput.emit('');
+    this.resetNumberStream();
   }
 
   correctInput() {
-    this.reset();
-    setTimeout(() => {
-      this.addInput(this.progress.substring(0, this.progress.length - 1));
-    }, 1);
+    this.resetNumberStream();
+    this.addInput(this.progress.substring(0, this.progress.length - 1));
   }
 
   addInput(input = '') {
@@ -96,5 +113,4 @@ export class NumericKeypadComponent implements OnInit {
   padLeadingZeros(str: string, targetLength: number): string {
     return ('00000' + str).slice(-targetLength);
   }
-
 }
