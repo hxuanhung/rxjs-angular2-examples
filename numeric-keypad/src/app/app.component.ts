@@ -7,4 +7,9 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'app works!';
+  binding = '1';
+  doAction = '';
+  onChange(input) {
+    this.doAction = input;
+  }
 }

@@ -1,3 +1,7 @@
 <h1>
   {{title}}
 </h1>
+<h1>{{doAction}}</h1>
+<p>binding {{binding}}</p>
+<app-numeric-keypad [maxInput]=5 [keyboardInput]="binding" (sendInput)=onChange($event)></app-numeric-keypad>
+<button (click)="binding='2'">2</button>
