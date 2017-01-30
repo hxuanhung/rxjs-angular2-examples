@@ -71,6 +71,9 @@ export class NumericKeypadComponent implements OnInit {
 
     this.numberSubscription = this.number$.subscribe(x => {
       this.progress = x;
+      if (this.addLeadingZeros) {
+        this.progressWithLeadingZeros = this.padLeadingZeros(this.progress, this.maxInput);
+      }
       this.sendInput.emit(this.progress);
     });
   }
