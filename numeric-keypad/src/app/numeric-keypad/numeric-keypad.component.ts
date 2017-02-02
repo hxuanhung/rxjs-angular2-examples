@@ -31,7 +31,9 @@ export class NumericKeypadComponent implements OnInit {
   constructor() { }
 
   ngOnChanges() {
-    this.resetNumberStream();
+    if (this.numberSubscription) {
+      this.resetNumberStream();
+    }
     if (this.keyboardInput.length > 0) {
       this.addInput(this.keyboardInput);
     }
